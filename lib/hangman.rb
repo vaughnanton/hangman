@@ -1,8 +1,9 @@
 class Hangman
 
-  def initialize
+  def initialize(dictionary)
     @gameover = false
     @wrong_guesses = 0
+    @dictionary = dictionary
     @letters_guessed = []
     @current_word = ""
     @word = get_word
@@ -13,8 +14,7 @@ class Hangman
       print_status
       guess = get_guess
       guess.upcase == guess_outcome
-      @gamover = game_over
-      save_game
+      @gameover = game_over
     end
     if @wrong_guesses >= 10
       puts "\n\n Max guesses, you lose!"
@@ -24,18 +24,27 @@ class Hangman
   end
 
   def get_word
-    words = []
-    chosen_word = ""
-    file = File.open("dictionary.txt").each do |line|
-      if line.length >= 5 && line.length <= 12
-        words << line
-    end
-    chosen_word = words.sample.upcase
-  end
+		words = []
+		chosen_word = ""
+
+		file = File.open(@dictionary).each {|word|
+			words << word
+		}
+		file.close
+
+		loop do
+			chosen_word = words[rand(words.length)]
+			break if chosen_word.length > 5 && chosen_word.length <= 13
+		end
+
+		(chosen_word.length-1).times{@current_word += "*"}
+
+		return chosen_word.upcase
+	end
 
   def print_status
     puts "\nThe current word is: #{@current_word}\n"
-    puts @view[@wrong_guesses]
+    puts @wrong_guesses
     puts "\nLetters you have guessed: #{@letters_guessed.join(", ")}"
     puts "You have #{10-@wrong_guesses} guesses left"
   end
@@ -56,8 +65,8 @@ class Hangman
       return false
     elsif guess.length != 1
       return false
-    elsif guess.match(/^[[:alpha]]$/)
-      @letters_guessed << guess.upacase
+    elsif guess.match(/^[[:alpha:]]$/)
+      @letters_guessed << guess.upcase
       return true
     else
       return false
@@ -79,7 +88,7 @@ class Hangman
   def game_over
     if @wrong_guesses >= 10
       @gameover = true
-    else
+    elsif
       for i in 0..@current_word.length
         if @current_word[i] == "*"
           return false
@@ -90,7 +99,8 @@ class Hangman
   end
 
 end
-end
 
 
-Hangman.new
+
+game = Hangman.new("dictionary.txt")
+game.game_loop
