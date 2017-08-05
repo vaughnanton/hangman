@@ -4,6 +4,6 @@ To run the game, use the following steps:
 
 1. verify ruby is installed on your computer
 2. save files
-3. `cd` into directory
-4. verify ruby is installed on your computer
+3. open computer terminal
+4. `cd` into directory
 5. type `ruby lib/hangman.rb` into terminal window
