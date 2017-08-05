@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Hangman
 
   def initialize(dictionary)
@@ -11,10 +13,11 @@ class Hangman
 
   def game_loop
     while !@gameover
-      print_status
+      game_status
       guess = get_guess
       guess.upcase == guess_outcome
       @gameover = game_over
+      save
     end
     if @wrong_guesses >= 10
       puts "\n\n Max guesses, you lose!"
@@ -27,7 +30,7 @@ class Hangman
 		words = []
 		chosen_word = ""
 
-		file = File.open(@dictionary).each {|word|
+		file = File.open(@dictionary).each { |word|
 			words << word
 		}
 		file.close
@@ -42,7 +45,7 @@ class Hangman
 		return chosen_word.upcase
 	end
 
-  def print_status
+  def game_status
     puts "\nThe current word is: #{@current_word}\n"
     puts @wrong_guesses
     puts "\nLetters you have guessed: #{@letters_guessed.join(", ")}"
@@ -100,7 +103,31 @@ class Hangman
 
 end
 
+def load
+  if File.exists?("saves/save_file.yaml")
+    content = File.open("saves/save_file.yaml", "r") { |file| file.read }
+    YAML.load(content)
+  else
+    puts "e r r o r - There is no saved file!"
+  end
+end
+
+def save
+  Dir.mkdir("saves") unless Dir.exist? "saves"
+  filename = "saves/save_file.yaml"
+  File.open(filename, "w") do |file|
+    file.puts YAML.dump(self)
+  end
+end
+
+to_load = ""
+loop do
+  print "Do you want to load prior game? (Y/N) : "
+  to_load = gets.chomp
+  break if to_load.upcase == "Y" || to_load.upcase == "N"
+  puts "Incorrect input!"
+end
 
 
-game = Hangman.new("dictionary.txt")
-game.game_loop
+game = to_load.upcase == "Y" ? load : Hangman.new("dictionary.txt")
+game.game_loop if File.exists?("saves/save_file.yaml") || to_load.upcase == "N"

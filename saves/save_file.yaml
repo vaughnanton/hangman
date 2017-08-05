@@ -1,0 +1,14 @@
+--- !ruby/object:Hangman
+gameover: false
+wrong_guesses: 3
+dictionary: dictionary.txt
+letters_guessed:
+- A
+- E
+- I
+- O
+- U
+current_word: "**O*E**E*O*E"
+word: 'PROGESTERONE
+
+'
